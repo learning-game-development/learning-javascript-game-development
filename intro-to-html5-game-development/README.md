@@ -1,7 +1,9 @@
-# :mortar_board: Intro to HTML5 Game Development
+# :mortar_board: :video_game: Intro to HTML5 Game Development
 
-Zenva Academy online [course](https://academy.zenva.com/course/intro-to-html5-game-development/)
+:link: [Online course][course] on Zenva Academy
 
-## HTML5 Game Devlopment Resources
+## Game Engine
 
-- [Quintus](http://www.html5quintus.com/)
+- [Quintus Engine](http://www.html5quintus.com/) | [GitHub](https://github.com/cykod/Quintus)
+
+[course]: https://academy.zenva.com/course/intro-to-html5-game-development/

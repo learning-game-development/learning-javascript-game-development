@@ -7,7 +7,7 @@ Projects, samples and templates created to learn game development with JavaScrip
 
 ## Tutorials
 
-:construction: WIP
+1. :o: [Intro to HTML5 Game Development](intro-to-html5-game-development/) (Zenva Academy)
 
 ## :page_with_curl: License
 

@@ -5,9 +5,13 @@ Projects, samples and templates created to learn game development with JavaScrip
 :heavy_check_mark: Completed  
 :o: Incomplete
 
-## Tutorials
+## :beginner: Online Tutorials
 
 1. :o: [Intro to HTML5 Game Development](intro-to-html5-game-development/) (Zenva Academy)
+
+## :books: Book Tutorials
+
+1. :o: [CoderDojo: Create with Code - make your own game](coderdojo-create-with-code-make-your-own-game/)
 
 ## :page_with_curl: License
 

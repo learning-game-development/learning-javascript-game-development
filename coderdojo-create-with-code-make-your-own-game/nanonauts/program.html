@@ -10,17 +10,23 @@
 
 <body>
   <script>
-    console.log('The Nanonauts rock!');
+    var image = new Image();
+    image.src = 'nanonaut.png';
 
-    var value1 = 4;
-    var value2 = 2;
-    console.log(value1 + value2);
-    var value3 = 1;
-    console.log(value1 - value3);
+    var canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 600;
 
-    var name = 'Nanonauts!';
-    var message = "I can't believe how good they are.";
-    console.log(name + message);
+    var c = canvas.getContext('2d');
+
+    window.addEventListener('load', start);
+    function start() {
+      c.fillStyle = 'green';
+      c.fillRect(10, 10, 30, 30);
+      c.drawImage(image, 20, 40);
+    }
+
+    document.body.appendChild(canvas);
   </script>
 </body>
 

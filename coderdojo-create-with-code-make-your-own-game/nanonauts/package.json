@@ -1,0 +1,20 @@
+{
+  "name": "nanonauts",
+  "version": "1.0.0",
+  "description": "2D platform, endless runner game in JavaScript",
+  "main": "program.html",
+  "scripts": {
+    "start": "parcel program.html",
+    "build": "parcel build program.html"
+  },
+  "keywords": [
+    "javascript-game",
+    "endless-runner",
+    "2d-platform-game"
+  ],
+  "author": "Quintin Henn <quintin.henn@gmail.com> (http:/skerwe.web.za)",
+  "license": "ISC",
+  "devDependencies": {
+    "parcel-bundler": "^1.12.5"
+  }
+}

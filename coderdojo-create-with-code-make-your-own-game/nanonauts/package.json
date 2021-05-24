@@ -4,8 +4,8 @@
   "description": "2D platform, endless runner game in JavaScript",
   "main": "program.html",
   "scripts": {
-    "start": "parcel program.html",
-    "build": "parcel build program.html"
+    "start": "parcel src/program.html",
+    "build": "parcel build src/program.html"
   },
   "keywords": [
     "javascript-game",

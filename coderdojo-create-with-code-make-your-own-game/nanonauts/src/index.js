@@ -1,5 +1,5 @@
-import background from './background.png';
-import nanonaut from './nanonaut.png';
+import background from './images/background.png';
+import nanonaut from './images/nanonaut.png';
 
 // CONSTANTS
 let CANVAS_WIDTH = 800;
@@ -8,6 +8,9 @@ let NANONAUT_WIDTH = 181;
 let NANONAUT_HEIGHT = 229;
 let NANONAUT_Y_ACCELERATION = 1;
 let GROUND_Y = 540;
+let NANONAUT_JUMP_SPEED = 20;
+
+let SPACE_KEYCODE = 32;
 
 // SETUP
 let canvas = document.createElement('canvas');
@@ -25,6 +28,11 @@ nanonautImage.src = nanonaut;
 let nanonautX = 50;
 let nanonautY = 40;
 let nanonautYSpeed = 0;
+let nanonautIsInAir = false;
+let spaceKeyIsPressed = false;
+
+window.addEventListener('keydown', onKeyDown);
+window.addEventListener('keyup', onKeyUp);
 
 window.addEventListener('load', start);
 
@@ -40,14 +48,32 @@ function mainLoop() {
 }
 
 // PLAYER INPUT
+function onKeyDown(event) {
+  if (event.keyCode === SPACE_KEYCODE) {
+    spaceKeyIsPressed = true;
+  }
+}
+
+function onKeyUp(event) {
+  if (event.keyCode === SPACE_KEYCODE) {
+    spaceKeyIsPressed = false;
+  }
+}
+
 // UPDATING
 function update() {
   // Update Nanonaut.
+  if (spaceKeyIsPressed && !nanonautIsInAir) {
+    nanonautYSpeed = -NANONAUT_JUMP_SPEED;
+    nanonautIsInAir = true;
+  }
+
   nanonautY = nanonautY + nanonautYSpeed;
   nanonautYSpeed = nanonautYSpeed + NANONAUT_Y_ACCELERATION;
   if (nanonautY > (GROUND_Y - NANONAUT_HEIGHT)) {
     nanonautY = GROUND_Y - NANONAUT_HEIGHT;
     nanonautYSpeed = 0;
+    nanonautIsInAir = false;
   }
 }
 

@@ -2,15 +2,19 @@ import background from './images/background.png';
 import nanonaut from './images/nanonaut.png';
 
 // CONSTANTS
-let CANVAS_WIDTH = 800;
-let CANVAS_HEIGHT = 600;
-let NANONAUT_WIDTH = 181;
-let NANONAUT_HEIGHT = 229;
-let NANONAUT_Y_ACCELERATION = 1;
-let GROUND_Y = 540;
-let NANONAUT_JUMP_SPEED = 20;
+const CANVAS_WIDTH = 800;
+const CANVAS_HEIGHT = 600;
 
-let SPACE_KEYCODE = 32;
+const NANONAUT_WIDTH = 181;
+const NANONAUT_HEIGHT = 229;
+const NANONAUT_Y_ACCELERATION = 1;
+const NANONAUT_JUMP_SPEED = 20;
+const NANONAUT_X_SPEED = 5;
+
+const BACKGROUND_WIDTH = 1000;
+const GROUND_Y = 540;
+
+const SPACE_KEYCODE = 32;
 
 // SETUP
 let canvas = document.createElement('canvas');
@@ -19,14 +23,17 @@ canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 document.body.appendChild(canvas);
 
+let cameraX = 0;
+let cameraY = 0;
+
 let backgroundImage = new Image();
 backgroundImage.src = background;
 
 let nanonautImage = new Image();
 nanonautImage.src = nanonaut;
 
-let nanonautX = 50;
-let nanonautY = 40;
+let nanonautX = CANVAS_WIDTH / 2;
+let nanonautY = GROUND_Y - NANONAUT_HEIGHT;
 let nanonautYSpeed = 0;
 let nanonautIsInAir = false;
 let spaceKeyIsPressed = false;
@@ -62,6 +69,7 @@ function onKeyUp(event) {
 
 // UPDATING
 function update() {
+  nanonautX = nanonautX + NANONAUT_X_SPEED;
   // Update Nanonaut.
   if (spaceKeyIsPressed && !nanonautIsInAir) {
     nanonautYSpeed = -NANONAUT_JUMP_SPEED;
@@ -75,6 +83,9 @@ function update() {
     nanonautYSpeed = 0;
     nanonautIsInAir = false;
   }
+
+  // Update camera
+  cameraX = nanonautX - 150;
 }
 
 // DRAWING
@@ -86,11 +97,13 @@ function draw() {
   ctx.fillRect(0, 0, CANVAS_WIDTH, GROUND_Y - 40);
 
   // Draw the background.
-  ctx.drawImage(backgroundImage, 0, -210);
+  let backgroundX = - (cameraX % BACKGROUND_WIDTH);
+  ctx.drawImage(backgroundImage, backgroundX, -210);
+  ctx.drawImage(backgroundImage, backgroundX + BACKGROUND_WIDTH, -210);
 
   // Draw the ground.
   ctx.fillStyle = 'ForestGreen';
   ctx.fillRect(0, GROUND_Y - 40, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_Y + 40);
 
-  ctx.drawImage(nanonautImage, nanonautX, nanonautY);
+  ctx.drawImage(nanonautImage, nanonautX - cameraX, nanonautY - cameraY);
 }

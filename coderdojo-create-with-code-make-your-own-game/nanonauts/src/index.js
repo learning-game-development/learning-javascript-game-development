@@ -1,5 +1,6 @@
 import background from './images/background.png';
-import nanonaut from './images/nanonaut.png';
+import nanonaut from './images/animatedNanonaut.png';
+import bush1 from './images/bush1.png';
 
 // CONSTANTS
 const CANVAS_WIDTH = 800;
@@ -16,6 +17,10 @@ const GROUND_Y = 540;
 
 const SPACE_KEYCODE = 32;
 
+const NANONAUT_NR_FRAMES_PER_ROW = 5;
+const NANONAUT_NR_ANIMATION_FRAMES = 7;
+const NANONAUT_ANIMATION_SPEED = 3;
+
 // SETUP
 let canvas = document.createElement('canvas');
 let ctx = canvas.getContext('2d');
@@ -25,6 +30,9 @@ document.body.appendChild(canvas);
 
 let cameraX = 0;
 let cameraY = 0;
+
+let bush1Image = new Image();
+bush1Image.src = bush1;
 
 let backgroundImage = new Image();
 backgroundImage.src = background;
@@ -37,6 +45,8 @@ let nanonautY = GROUND_Y - NANONAUT_HEIGHT;
 let nanonautYSpeed = 0;
 let nanonautIsInAir = false;
 let spaceKeyIsPressed = false;
+let nanonautFrameNr = 0;
+let gameFrameCounter = 0;
 
 window.addEventListener('keydown', onKeyDown);
 window.addEventListener('keyup', onKeyUp);
@@ -69,7 +79,8 @@ function onKeyUp(event) {
 
 // UPDATING
 function update() {
-  nanonautX = nanonautX + NANONAUT_X_SPEED;
+  gameFrameCounter = gameFrameCounter + 1;
+
   // Update Nanonaut.
   if (spaceKeyIsPressed && !nanonautIsInAir) {
     nanonautYSpeed = -NANONAUT_JUMP_SPEED;
@@ -84,13 +95,23 @@ function update() {
     nanonautIsInAir = false;
   }
 
+  nanonautX = nanonautX + NANONAUT_X_SPEED;
+
   // Update camera
   cameraX = nanonautX - 150;
+
+  // Update Animation.
+  if ((gameFrameCounter % NANONAUT_ANIMATION_SPEED) === 0) {
+    nanonautFrameNr = nanonautFrameNr + 1;
+    if (nanonautFrameNr >= NANONAUT_NR_ANIMATION_FRAMES) {
+      nanonautFrameNr = 0;
+    }
+  }
 }
 
 // DRAWING
 function draw() {
-  // ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
   // Draw the sky.
   ctx.fillStyle = 'LightSkyBlue';
@@ -101,9 +122,18 @@ function draw() {
   ctx.drawImage(backgroundImage, backgroundX, -210);
   ctx.drawImage(backgroundImage, backgroundX + BACKGROUND_WIDTH, -210);
 
+  ctx.drawImage(bush1Image, 550, GROUND_Y - 100);
+  ctx.drawImage(bush1Image, 750, GROUND_Y - 90);
+
   // Draw the ground.
   ctx.fillStyle = 'ForestGreen';
   ctx.fillRect(0, GROUND_Y - 40, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_Y + 40);
 
-  ctx.drawImage(nanonautImage, nanonautX - cameraX, nanonautY - cameraY);
+  // Draw the Nanonaut.
+  let nanonautSpriteSheetRow = Math.floor(nanonautFrameNr / NANONAUT_NR_FRAMES_PER_ROW);
+  let nanonautSpriteSheetColumn = nanonautFrameNr % NANONAUT_NR_FRAMES_PER_ROW;
+  let nanonautSpriteSheetX = nanonautSpriteSheetColumn * NANONAUT_WIDTH;
+  let nanonautSpriteSheety = nanonautSpriteSheetRow * NANONAUT_HEIGHT;
+  ctx.drawImage(nanonautImage, nanonautSpriteSheetX, nanonautSpriteSheety,
+    NANONAUT_WIDTH, NANONAUT_HEIGHT, nanonautX - cameraX, nanonautY - cameraY, NANONAUT_WIDTH, NANONAUT_HEIGHT);
 }

@@ -4,12 +4,16 @@
   "description": "Intro to HTML5 Game Development opnline course",
   "main": "game.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "snowpack dev",
+    "build": "snowpack build"
   },
-  "keywords": [],
+  "keywords": [
+    "Zenva Course",
+    "Quintus"
+  ],
   "author": "Quintin Henn",
   "license": "ISC",
   "devDependencies": {
-    "http-server": "^0.12.3"
+    "snowpack": "^3.5.7"
   }
 }

@@ -1,6 +1,7 @@
 import background from './images/background.png';
 import nanonaut from './images/animatedNanonaut.png';
 import bush1 from './images/bush1.png';
+import bush2 from './images/bush2.png';
 
 // CONSTANTS
 const CANVAS_WIDTH = 800;
@@ -33,6 +34,19 @@ let cameraY = 0;
 
 let bush1Image = new Image();
 bush1Image.src = bush1;
+
+let bush2Image = new Image();
+bush2Image.src = bush2;
+
+let bushData = [{
+  x: 500,
+  y: 100,
+  image: bush1Image
+}, {
+  x: 750,
+  y: 90,
+  image: bush2Image
+}];
 
 let backgroundImage = new Image();
 backgroundImage.src = background;
@@ -122,12 +136,13 @@ function draw() {
   ctx.drawImage(backgroundImage, backgroundX, -210);
   ctx.drawImage(backgroundImage, backgroundX + BACKGROUND_WIDTH, -210);
 
-  ctx.drawImage(bush1Image, 550, GROUND_Y - 100);
-  ctx.drawImage(bush1Image, 750, GROUND_Y - 90);
-
   // Draw the ground.
   ctx.fillStyle = 'ForestGreen';
   ctx.fillRect(0, GROUND_Y - 40, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_Y + 40);
+
+  for (let i = 0; i <  bushData.length; i++) {
+    ctx.drawImage(bushData[i].image, bushData[i].x - cameraX, GROUND_Y - bushData[i].y - cameraY);
+  }
 
   // Draw the Nanonaut.
   let nanonautSpriteSheetRow = Math.floor(nanonautFrameNr / NANONAUT_NR_FRAMES_PER_ROW);

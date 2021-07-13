@@ -38,15 +38,7 @@ bush1Image.src = bush1;
 let bush2Image = new Image();
 bush2Image.src = bush2;
 
-let bushData = [{
-  x: 500,
-  y: 100,
-  image: bush1Image
-}, {
-  x: 750,
-  y: 90,
-  image: bush2Image
-}];
+let bushData = generateBushes();
 
 let backgroundImage = new Image();
 backgroundImage.src = background;
@@ -69,6 +61,27 @@ window.addEventListener('load', start);
 
 function start() {
   window.requestAnimationFrame(mainLoop);
+}
+
+function generateBushes() {
+  let generatedBushData = [];
+  let bushX = 0;
+  while (bushX < (2 * CANVAS_WIDTH)) {
+    let bushImage;
+    if (Math.random() >= 0.5) {
+      bushImage = bush1Image;
+    } else {
+      bushImage = bush2Image;
+    }
+
+    generatedBushData.push({
+      x: bushX,
+      y: 80 + Math.random() * 20,
+      image: bushImage
+    });
+    bushX += 150 + Math.random() * 200;
+  }
+  return generatedBushData;
 }
 
 // MAIN LOOP
@@ -111,7 +124,7 @@ function update() {
 
   nanonautX = nanonautX + NANONAUT_X_SPEED;
 
-  // Update camera
+  // Update camera.
   cameraX = nanonautX - 150;
 
   // Update Animation.
@@ -119,6 +132,13 @@ function update() {
     nanonautFrameNr = nanonautFrameNr + 1;
     if (nanonautFrameNr >= NANONAUT_NR_ANIMATION_FRAMES) {
       nanonautFrameNr = 0;
+    }
+  }
+
+  // Update bushes.
+  for (let i = 0; i < bushData.length ; i++) {
+    if ((bushData[i].x - cameraX) < -CANVAS_WIDTH) {
+      bushData[i].x += (2 * CANVAS_WIDTH) + 150;
     }
   }
 }

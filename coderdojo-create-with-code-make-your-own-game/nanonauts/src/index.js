@@ -1,5 +1,6 @@
 import background from './images/background.png';
 import nanonaut from './images/animatedNanonaut.png';
+import robot from './images/animatedRobot.png';
 import bush1 from './images/bush1.png';
 import bush2 from './images/bush2.png';
 
@@ -13,18 +14,27 @@ const NANONAUT_Y_ACCELERATION = 1;
 const NANONAUT_JUMP_SPEED = 20;
 const NANONAUT_X_SPEED = 5;
 
+const ROBOT_WIDTH = 141;
+const ROBOT_HEIGHT = 139;
+const ROBOT_X_SPEED = 4;
+
 const BACKGROUND_WIDTH = 1000;
 const GROUND_Y = 540;
 
 const SPACE_KEYCODE = 32;
 
-const NANONAUT_NR_FRAMES_PER_ROW = 5;
 const NANONAUT_NR_ANIMATION_FRAMES = 7;
 const NANONAUT_ANIMATION_SPEED = 3;
+const ROBOT_NR_ANIMATION_FRAMES = 9;
+const ROBOT_ANIMATION_SPEED = 5;
+
+const MIN_DISTANCE_BETWEEN_ROBOTS = 400;
+const MAX_DISTANCE_BETWEEN_ROBOTS = 1200;
+const MAX_ACTIVE_ROBOTS = 3;
 
 // SETUP
-let canvas = document.createElement('canvas');
-let ctx = canvas.getContext('2d');
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 document.body.appendChild(canvas);
@@ -32,19 +42,38 @@ document.body.appendChild(canvas);
 let cameraX = 0;
 let cameraY = 0;
 
-let bush1Image = new Image();
+const bush1Image = new Image();
 bush1Image.src = bush1;
 
-let bush2Image = new Image();
+const bush2Image = new Image();
 bush2Image.src = bush2;
 
-let bushData = generateBushes();
+const bushData = generateBushes();
 
-let backgroundImage = new Image();
+const backgroundImage = new Image();
 backgroundImage.src = background;
 
-let nanonautImage = new Image();
+const nanonautImage = new Image();
 nanonautImage.src = nanonaut;
+
+let nanonautSpriteSheet = {
+  nrFramesPerRow: 5,
+  spriteWidth: NANONAUT_WIDTH,
+  spriteHeight: NANONAUT_HEIGHT,
+  image: nanonautImage
+}
+
+const robotImage = new Image();
+robotImage.src = robot;
+
+let robotSpriteSheet = {
+  nrFramesPerRow: 3,
+  spriteWidth: ROBOT_WIDTH,
+  spriteHeight: ROBOT_HEIGHT,
+  image: robotImage
+};
+
+let robotData = [];
 
 let nanonautX = CANVAS_WIDTH / 2;
 let nanonautY = GROUND_Y - NANONAUT_HEIGHT;
@@ -124,9 +153,6 @@ function update() {
 
   nanonautX = nanonautX + NANONAUT_X_SPEED;
 
-  // Update camera.
-  cameraX = nanonautX - 150;
-
   // Update Animation.
   if ((gameFrameCounter % NANONAUT_ANIMATION_SPEED) === 0) {
     nanonautFrameNr = nanonautFrameNr + 1;
@@ -135,12 +161,63 @@ function update() {
     }
   }
 
+  // Update camera.
+  cameraX = nanonautX - 150;
+
   // Update bushes.
-  for (let i = 0; i < bushData.length ; i++) {
+  for (let i = 0; i < bushData.length; i++) {
     if ((bushData[i].x - cameraX) < -CANVAS_WIDTH) {
       bushData[i].x += (2 * CANVAS_WIDTH) + 150;
     }
   }
+  // Update robots.
+  updateRobots();
+}
+
+function updateRobots() {
+  // Move and animate robots.
+  for (let i = 0; i < robotData.length; i++) {
+    robotData[i].x -= ROBOT_X_SPEED;
+    if ((gameFrameCounter % ROBOT_ANIMATION_SPEED) === 0) {
+      robotData[i].frameNr = robotData[i].frameNr + 1;
+      if (robotData[i].frameNr >= ROBOT_NR_ANIMATION_FRAMES) {
+        robotData[i].frameNr = 0;
+      }
+    }
+  }
+
+  // Remove robots that have gone off-screen
+  let robotIndex = 0;
+  while (robotIndex < robotData.length) {
+    if (robotData[robotIndex].x < cameraX - ROBOT_WIDTH) {
+      robotData.splice(robotIndex, 1);
+    } else {
+      robotIndex += 1;
+    }
+  }
+
+  if (robotData.length < MAX_ACTIVE_ROBOTS) {
+    let lastRobotX = CANVAS_WIDTH;
+    if (robotData.length > 0) {
+      lastRobotX = robotData[robotData.length - 1].x;
+    }
+    let newRobotX = lastRobotX + MIN_DISTANCE_BETWEEN_ROBOTS + Math.random() * (MAX_DISTANCE_BETWEEN_ROBOTS - MIN_DISTANCE_BETWEEN_ROBOTS);
+    robotData.push({
+      x: newRobotX,
+      y: GROUND_Y - ROBOT_HEIGHT,
+      frameNr: 0
+    });
+  }
+}
+
+function doesNanonautoverlapRobotAlongOneAxis(nanonautNearX, nanonautFarX, robotNearX, robotFarX) {
+  let nanonautOverlapsNearRobotEdge = (nanonautFarX >= robotNearX) && (nanonautFarX <= robotFarX);
+  let nanonautOverlapsFarRobotEdge = (nanonautNearX >= robotNearX) && (nanonautNearX <= robotFarX);
+  let nanonautOverlapsEntireRobot = (nanonautNearX <= robotNearX) && (nanonautFarX >= robotFarX);
+  return nanonautOverlapsNearRobotEdge || nanonautOverlapsFarRobotEdge || nanonautOverlapsEntireRobot;
+}
+
+function doesNanonautoverlapRobot(nanonautX, nanonautY, nanonautWidth, nanonautHeight, robotX, robotY, robotWidth, robotHeight) {
 }
 
 // DRAWING
@@ -160,15 +237,27 @@ function draw() {
   ctx.fillStyle = 'ForestGreen';
   ctx.fillRect(0, GROUND_Y - 40, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_Y + 40);
 
-  for (let i = 0; i <  bushData.length; i++) {
+  // Draw the bushes.
+  for (let i = 0; i < bushData.length; i++) {
     ctx.drawImage(bushData[i].image, bushData[i].x - cameraX, GROUND_Y - bushData[i].y - cameraY);
   }
 
+  // Draw the robots.
+  for (let i = 0; i < robotData.length; i++) {
+    drawAnimatedSprite(robotData[i].x - cameraX, robotData[i].y - cameraY, robotData[i].frameNr, robotSpriteSheet);
+  }
+
   // Draw the Nanonaut.
-  let nanonautSpriteSheetRow = Math.floor(nanonautFrameNr / NANONAUT_NR_FRAMES_PER_ROW);
-  let nanonautSpriteSheetColumn = nanonautFrameNr % NANONAUT_NR_FRAMES_PER_ROW;
-  let nanonautSpriteSheetX = nanonautSpriteSheetColumn * NANONAUT_WIDTH;
-  let nanonautSpriteSheety = nanonautSpriteSheetRow * NANONAUT_HEIGHT;
-  ctx.drawImage(nanonautImage, nanonautSpriteSheetX, nanonautSpriteSheety,
-    NANONAUT_WIDTH, NANONAUT_HEIGHT, nanonautX - cameraX, nanonautY - cameraY, NANONAUT_WIDTH, NANONAUT_HEIGHT);
+  drawAnimatedSprite(nanonautX - cameraX, nanonautY - cameraY, nanonautFrameNr, nanonautSpriteSheet);
+}
+
+function drawAnimatedSprite(screenX, screenY, frameNr, spriteSheet) {
+  let spriteSheetRow = Math.floor(frameNr / spriteSheet.nrFramesPerRow);
+  let spriteSheetColumn = frameNr % spriteSheet.nrFramesPerRow;
+  let spriteSheetX = spriteSheetColumn * spriteSheet.spriteWidth;
+  let spriteSheetY = spriteSheetRow * spriteSheet.spriteHeight;
+  ctx.drawImage(
+    spriteSheet.image, spriteSheetX, spriteSheetY,
+    spriteSheet.spriteWidth, spriteSheet.spriteHeight, screenX, screenY,
+    spriteSheet.spriteWidth, spriteSheet.spriteHeight);
 }
